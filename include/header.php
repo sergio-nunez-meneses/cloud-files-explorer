@@ -1,7 +1,18 @@
 <?php
-require_once './init/create_directories.php';
-require_once './controllers/variables.php';
-require_once './controllers/functions.php';
+session_start();
+
+define('ABS_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
+define('REL_PATH', DIRECTORY_SEPARATOR . basename(ABS_PATH) . DIRECTORY_SEPARATOR);
+define('HOME', ABS_PATH . 'home');
+
+$protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+$domain = $_SERVER['SERVER_NAME'];
+define('BASE_URL', "${protocol}://${domain}");
+
+require_once ABS_PATH . 'init/create_directories.php';
+require_once ABS_PATH . 'controllers/db.php';
+require_once ABS_PATH . 'controllers/user_class.php';
+require_once ABS_PATH . 'controllers/functions.php';
 
 // change current working directory
 if (!empty($_GET['dir'])) {
@@ -58,8 +69,7 @@ if (!empty($_GET['created']) && $_GET['created'] === 'folder') echo '<script> al
 if (!empty($_GET['created']) && $_GET['created'] === 'file') echo '<script> alert("file created"); </script>';
 if (!empty($_GET['action'])) echo '<script> alert("' . $_GET['action'] . '"); </script>';
 
-session_start();
-// $user = new User();
+$user = new User();
 ?>
 
 <!DOCTYPE html>
@@ -68,40 +78,57 @@ session_start();
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Sergio Núñez Meneses" name="author">
-    <title>Files Manager</title>
+    <link rel="icon" type="image/png" href="<?php echo REL_PATH;?>public/img/favicon3.png">
+    <link rel="stylesheet" href="<?php echo REL_PATH;?>public/less/style.css">
+    <script src="<?php echo REL_PATH;?>public/js/functionsDOM.js"></script>
+    <title><?php echo $title; ?></title>
   </head>
+
   <body>
 
-    <?php
-    // DISPLAY NAVBAR
-    $breadcrumb_menu = explode(DIRECTORY_SEPARATOR, getcwd());
-    $path_builder = '';
-    $is_home = false;
-
-    echo '
     <header>
-    <nav class="" style="display: flex; justify-content: space-between">
-    ';
-    foreach ($breadcrumb_menu as $item) {
-      $path_builder .= $item . DIRECTORY_SEPARATOR;
-      if ($item === $home_dir) $is_home = true;
-      if ($is_home) {
-        echo
-        '
-        <button type="button">
-        <a href="?dir=' . $path_builder . '" style="color: #000; text-decoration: none">' . $item . '</a>
-        </button>
-        ';
-      }
-    }
-    echo '
-    <button type="submit" name="show_hide" form="show_hide" value="' . $show_hide . '">';
-    if ($show_hide === 'show') echo 'show';
-    else echo 'hide';
+      <section class="logo-container">
+        <a href="index.php">
+          <img class="logo" src="<?php echo REL_PATH; ?>public/img/favicon.png" alt="logo">
+        </a>
+      </section>
+      <section>
+        <nav class="nav-container">
 
-    echo '
-    </button>
-    <button type="button">login</button>
-    </nav>
+          <?php
+          if (basename($_SERVER['SCRIPT_NAME']) !== 'index.php') {
+            $breadcrumb_menu = explode(DIRECTORY_SEPARATOR, getcwd());
+            $path_builder = '';
+            $is_home = false;
+
+            foreach ($breadcrumb_menu as $item) {
+              $path_builder .= $item . DIRECTORY_SEPARATOR;
+              if ($item === $home_dir) $is_home = true;
+              if ($is_home) {
+                ?>
+                <button type="button">
+                  <a href="?dir=<?php echo $path_builder; ?>">
+                    <?php echo $item; ?>
+                  </a>
+                </button>
+                <?php
+              }
+            }
+            ?>
+
+            <button type="submit" name="show_hide" form="show_hide" value="<?php echo $show_hide; ?>">
+              <?php
+              if ($show_hide === 'show') echo 'show';
+              else echo 'hide';
+              ?>
+            </button>
+            <?php
+            $user->is_logged();
+          }
+          ?>
+
+        </nav>
+      </section>
     </header>
-    ';
+
+    <main>

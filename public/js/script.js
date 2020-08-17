@@ -6,10 +6,6 @@ if (FORM_UPDATE !== null) {
   FORM_UPDATE.onsubmit = confirmAction;
 }
 
-function getID(id) {
-  return document.getElementById(id);
-}
-
 function ajaxResponse() {
   // let response = JSON.parse(this.responseText);
   console.log(this.responseText);
@@ -18,14 +14,14 @@ function ajaxResponse() {
 function ajaxSend(oFormElement) {
   if (!oFormElement.action) {
     return;
-  }
+  } else {
+    let oReq = new XMLHttpRequest();
+    oReq.onload = ajaxResponse;
 
-  let oReq = new XMLHttpRequest();
-  oReq.onload = ajaxResponse;
-
-  if (oFormElement.method.toLowerCase() === 'post') {
-    oReq.open('post', oFormElement.action);
-    oReq.send(new FormData(oFormElement));
+    if (oFormElement.method.toLowerCase() === 'post') {
+      oReq.open('post', oFormElement.action);
+      oReq.send(new FormData(oFormElement));
+    }
   }
 }
 

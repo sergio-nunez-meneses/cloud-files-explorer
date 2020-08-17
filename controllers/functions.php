@@ -2,6 +2,7 @@
 
 function file_permissions($filename) {
   $perms = fileperms($filename);
+  $info = '';
 
   if (($perms & 0xC000) == 0xC000) $info = 's';
   elseif (($perms & 0xA000) == 0xA000) $info = 'l';
@@ -28,9 +29,9 @@ function file_permissions($filename) {
 }
 
 function list_dir($dir) {
-  if ($dir[strlen($dir)-1] != DIRECTORY_SEPARATOR) $dir .= DIRECTORY_SEPARATOR;
+  if ($dir[strlen($dir)-1] !== DIRECTORY_SEPARATOR) $dir .= DIRECTORY_SEPARATOR;
 
-  if (!is_dir($dir)) die ("failed to open directory: $dir");
+  if (!is_dir($dir)) die ("failed to open directory: $dir is not a valid directory");
 
   $cwd  = scandir($dir);
   $dir_objects = [];
@@ -56,15 +57,15 @@ function sort_files($array, $by, $order = SORT_ASC) {
   $sortable_array = [];
 
   if (count($array) > 0) {
-    foreach ($array as $k => $v) {
-      if (is_array($v)) {
-        foreach ($v as $k2 => $v2) {
-          if ($k2 == $by) {
-            $sortable_array[$k] = $v2;
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        foreach ($value as $key2 => $value2) {
+          if ($key2 == $by) {
+            $sortable_array[$key] = $value2;
           }
         }
       } else {
-        $sortable_array[$k] = $v;
+        $sortable_array[$key] = $value;
       }
     }
 
@@ -77,11 +78,17 @@ function sort_files($array, $by, $order = SORT_ASC) {
       break;
     }
 
-    foreach ($sortable_array as $k => $v) {
-      $new_array[$k] = $array[$k];
+    foreach ($sortable_array as $key => $value) {
+      $new_array[$key] = $array[$key];
     }
   }
   return $new_array;
+}
+
+function base_url() {
+  $protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
+  $domain = $_SERVER['SERVER_NAME'];
+  return "${protocol}://${domain}";
 }
 
 function upload_file() {
@@ -92,7 +99,7 @@ function upload_file() {
     $element_image = filter_var($_FILES['files']['name'][0], FILTER_SANITIZE_STRING);
 
     move_uploaded_file($_FILES['files']['tmp_name'][0], $image_dir . $element_image);
-    header('Location:../index.php?uploaded=yes');
+    header('Location:../templates/home.php?uploaded=yes');
 
     // for AJAX
     // print_r($_POST);
@@ -105,7 +112,7 @@ function update_file() {
     return;
   } else {
     file_put_contents($_POST['path'], $_POST['file_content']);
-    header('Location:../index.php?updated=yes');
+    header('Location:../templates/home.php?updated=yes');
   }
 }
 
@@ -118,12 +125,12 @@ function create_file() {
 
     if (strpos($file_name, '.') === false) {
       mkdir($path . $file_name, 0777);
-      header('Location:../index.php?created=folder');
+      header('Location:../templates/home.php?created=folder');
     } else {
       $new_file = fopen($path . $file_name, 'a+');
       fwrite($new_file, 'write something');
       fclose($new_file);
-      header('Location:../index.php?created=file');
+      header('Location:../templates/home.php?created=file');
     }
   }
 }
@@ -140,6 +147,6 @@ function delete_file() {
     } else {
       unlink($delete_file);
     }
-    header("Location: ../index.php?action=$message");
+    header("Location:../templates/home.php?action=$message");
   }
 }

@@ -1,0 +1,51 @@
+html {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: helvetica, sans-serif;
+  font-size: 1rem;
+}
+.hidden {
+  display: none;
+}
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.logo-container .logo {
+  max-width: 100%;
+  width: 100px;
+  height: auto;
+}
+.nav-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.nav-container a {
+  color: #000;
+  text-decoration: none;
+}
+.sign-form-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+.sign-form-container form {
+  padding: 1rem;
+}
+.sign-form-container fieldset {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 1rem;
+}
