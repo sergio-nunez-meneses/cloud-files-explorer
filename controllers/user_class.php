@@ -3,7 +3,9 @@ require_once 'db.php';
 
 class User extends Database
 {
-  public function sign_up() {
+
+  public function sign_up()
+  {
     $error = false;
     $username = $password = $error_msg = '';
 
@@ -59,7 +61,9 @@ class User extends Database
       header("Location:../index.php?error=yes&error_message=$error_msg");
     }
   }
-  public function login() {
+
+  public function sign_in()
+  {
     $error = false;
     $username = $password = $error_msg = '';
 
@@ -89,6 +93,7 @@ class User extends Database
       }
     }
   }
+
   public function logout() {
     if ($_GET['logout'] == 'yes') {
       session_unset();
@@ -96,11 +101,20 @@ class User extends Database
       header('Location:../index.php');
     }
   }
+
   public function is_logged() {
     if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
       return;
     } else {
       include '../include/login_nav.php';
     }
+  }
+
+  public function user_id($user)
+  {
+    $username = $user;
+    $stmt = $this->run_query('SELECT * FROM users WHERE username = :username', ['username' => $username]);
+    $user = $stmt->fetch();
+    return $user['id'];
   }
 }

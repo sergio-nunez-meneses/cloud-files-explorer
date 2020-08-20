@@ -5,14 +5,12 @@ define('ABS_PATH', dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR);
 define('REL_PATH', DIRECTORY_SEPARATOR . basename(ABS_PATH) . DIRECTORY_SEPARATOR);
 define('HOME', ABS_PATH . 'home');
 
-$protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
-$domain = $_SERVER['SERVER_NAME'];
-define('BASE_URL', "${protocol}://${domain}");
-
 require_once ABS_PATH . 'init/create_directories.php';
+require_once ABS_PATH . 'controllers/functions.php';
 require_once ABS_PATH . 'controllers/db.php';
 require_once ABS_PATH . 'controllers/user_class.php';
-require_once ABS_PATH . 'controllers/functions.php';
+require_once ABS_PATH . 'controllers/directory_class.php';
+require_once ABS_PATH . 'controllers/file_class.php';
 
 // change current working directory
 if (!empty($_GET['dir'])) {
@@ -63,10 +61,26 @@ if (!empty($_GET['file'])) {
 }
 
 // display action informations
-if (!empty($_GET['uploaded'])) echo '<script> alert("file uploaded"); </script>';
+if (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'yes') {
+  echo '<script> alert("file uploaded"); </script>';
+} elseif (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'no') {
+  echo '<script> alert("file already exists"); </script>';
+} elseif (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'size') {
+  echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+}
+
+if (!empty($_GET['created']) && $_GET['created'] === 'folder') {
+  echo '<script> alert("folder created"); </script>';
+} elseif (!empty($_GET['created']) && $_GET['created'] === 'file') {
+  echo '<script> alert("file created"); </script>';
+} elseif (!empty($_GET['created']) && $_GET['created'] === 'size') {
+  echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+}
+
 if (!empty($_GET['updated'])) echo '<script> alert("file updated"); </script>';
-if (!empty($_GET['created']) && $_GET['created'] === 'folder') echo '<script> alert("folder created"); </script>';
-if (!empty($_GET['created']) && $_GET['created'] === 'file') echo '<script> alert("file created"); </script>';
+
+if (!empty($_GET['displayed'])) echo '<script> alert("file cannot be displayed"); </script>';
+
 if (!empty($_GET['action'])) echo '<script> alert("' . $_GET['action'] . '"); </script>';
 
 $user = new User();
@@ -103,7 +117,7 @@ $user = new User();
 
             foreach ($breadcrumb_menu as $item) {
               $path_builder .= $item . DIRECTORY_SEPARATOR;
-              if ($item === $home_dir) $is_home = true;
+              if ($item === basename(HOME)) $is_home = true;
               if ($is_home) {
                 ?>
                 <button type="button">
@@ -115,7 +129,6 @@ $user = new User();
               }
             }
             ?>
-
             <button type="submit" name="show_hide" form="show_hide" value="<?php echo $show_hide; ?>">
               <?php
               if ($show_hide === 'show') echo 'show';

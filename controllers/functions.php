@@ -28,6 +28,27 @@ function file_permissions($filename) {
   return $info;
 }
 
+function formatted_size($bytes, $decimals = 2) {
+  $sz = '';
+  $factor = floor((strlen($bytes) - 1) / 3);
+
+  if ($factor > 0) $sz = 'KMGT';
+
+  return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor - 1] . 'B';
+}
+
+function directorySize($path) {
+  $total_bytes = 0;
+  $path = realpath($path);
+
+  if ($path !== false && $path != '' && file_exists($path)) {
+    foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)) as $object) {
+      $total_bytes += $object->getSize();
+    }
+  }
+  return $total_bytes;
+}
+
 function list_dir($dir) {
   if ($dir[strlen($dir)-1] !== DIRECTORY_SEPARATOR) $dir .= DIRECTORY_SEPARATOR;
 
@@ -42,7 +63,7 @@ function list_dir($dir) {
     $file_object = [
       'name' => $files,
       'path' => $file_path,
-      'size' => filesize($file_path),
+      'size' => formatted_size(filesize($file_path), 0),
       'perm' => file_permissions($file_path),
       'type' => mime_content_type($file_path),
       'date' => date("d F Y H:i", filemtime($file_path))
@@ -88,23 +109,8 @@ function sort_files($array, $by, $order = SORT_ASC) {
 function base_url() {
   $protocol = empty($_SERVER['HTTPS']) ? 'http' : 'https';
   $domain = $_SERVER['SERVER_NAME'];
-  return "${protocol}://${domain}";
-}
-
-function upload_file() {
-  if (!isset($_POST['upload'])) {
-    return;
-  } else {
-    $image_dir = getcwd() . DIRECTORY_SEPARATOR . 'home' . DIRECTORY_SEPARATOR;
-    $element_image = filter_var($_FILES['files']['name'][0], FILTER_SANITIZE_STRING);
-
-    move_uploaded_file($_FILES['files']['tmp_name'][0], $image_dir . $element_image);
-    header('Location:../templates/home.php?uploaded=yes');
-
-    // for AJAX
-    // print_r($_POST);
-    // echo "file $element_image uploaded";
-  }
+  $url = str_replace(dirname(realpath(__DIR__)), "${protocol}://${domain}", $cwd);
+  return $url;
 }
 
 function update_file() {
@@ -113,25 +119,6 @@ function update_file() {
   } else {
     file_put_contents($_POST['path'], $_POST['file_content']);
     header('Location:../templates/home.php?updated=yes');
-  }
-}
-
-function create_file() {
-  if (!isset($_POST['create'])) {
-    return;
-  } else {
-    $file_name = $_POST['file_name'];
-    $path = $_POST['path'] . DIRECTORY_SEPARATOR;
-
-    if (strpos($file_name, '.') === false) {
-      mkdir($path . $file_name, 0777);
-      header('Location:../templates/home.php?created=folder');
-    } else {
-      $new_file = fopen($path . $file_name, 'a+');
-      fwrite($new_file, 'write something');
-      fclose($new_file);
-      header('Location:../templates/home.php?created=file');
-    }
   }
 }
 

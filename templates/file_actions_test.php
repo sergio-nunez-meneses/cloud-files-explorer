@@ -1,9 +1,14 @@
 <?php
+include '../include/header.php';
 
-include '../controllers/functions.php';
+// if (isset($_POST['create'])) {
+//   create_file();
+// } elseif (isset($_POST['delete'])) {
+//   delete_file();
+// }
 
 if (isset($_POST['create'])) {
-  create_file();
+  (new File())->create_file();
 } elseif (isset($_POST['delete'])) {
-  delete_file();
+  (new File())->delete_file();
 }

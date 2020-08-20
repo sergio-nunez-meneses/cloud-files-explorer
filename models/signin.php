@@ -1,3 +1,3 @@
 <?php
 include '../include/header.php';
-$user->login();
+$user->sign_in();

@@ -1,4 +1,5 @@
 <?php
-include '../controllers/functions.php';
+include '../include/header.php';
 
-upload_file();
+// upload_file();
+(new File())->upload_file();
