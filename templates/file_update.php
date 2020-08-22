@@ -1,4 +1,3 @@
 <?php
-include '../controllers/functions.php';
-
-update_file();
+include '../include/header.php';
+(new File())->update_file();

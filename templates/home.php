@@ -98,41 +98,7 @@ include dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'include/header.php';
 <!-- DISPLAY SINGLE FILE -->
 <section class="" style="display:<?php echo $display_file; ?>;">
   <div class="" style="display: flex; flex-direction: column; justify-content: center; align-content: center; align-items: center; padding: 1rem;">
-    <?php
-    (new File())->display_single_file();
-    // if (!empty($file)) {
-    //   $file_type = explode('/', mime_content_type($file));
-    //
-    //   if ($file_type[0] === 'text') {
-    //     echo '
-    //     <form id="file-update" method="POST" action="../templates/file_update.php" enctype="application/x-www-form-urlencoded">
-    //     <input type="hidden" name="path" value="' . $file . '"/>
-    //     <textarea id="text" rows="40" cols="80" name="file_content" style="width: 100%; height: auto;">'
-    //     . htmlentities(file_get_contents($file)) .
-    //     '</textarea>
-    //     <button type="submit" name="update">save</button>
-    //     </form>
-    //     ';
-    //   } elseif ($file_type[0] === 'image') {
-    //     echo '
-    //     <img src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" style="max-width: 100%; height: auto; padding: 1rem 0">
-    //     <a href="home/' . basename($file) . '" download>
-    //     <button type="button">download</button>
-    //     </a>
-    //     ';
-    //   } elseif ($file_type[0] === 'audio') {
-    //     echo '
-    //     <audio controls autoplay="1" loop="true" style="width: 100%; padding: 1rem 0">
-    //     <source src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '">
-    //     </audio>
-    //     ';
-    //   } elseif ($file_type[1] === 'pdf') {
-    //     echo '<iframe src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>';
-    //   } elseif ($file_type[0] === 'video') {
-    //     echo '<iframe src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>';
-    //   }
-    // }
-    ?>
+    <?php (new File())->display_single_file(); ?>
   </div>
 </section>
 

@@ -12,6 +12,8 @@ require_once ABS_PATH . 'controllers/user_class.php';
 require_once ABS_PATH . 'controllers/directory_class.php';
 require_once ABS_PATH . 'controllers/file_class.php';
 
+define('HOME_SIZE', directorySize(HOME));
+
 // change current working directory
 if (!empty($_GET['dir'])) {
   $cwd = $_GET['dir'];
@@ -61,23 +63,35 @@ if (!empty($_GET['file'])) {
 }
 
 // display action informations
-if (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'yes') {
-  echo '<script> alert("file uploaded"); </script>';
-} elseif (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'no') {
-  echo '<script> alert("file already exists"); </script>';
-} elseif (!empty($_GET['uploaded']) && $_GET['uploaded'] === 'size') {
-  echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+if (!empty($_GET['uploaded'])) {
+  if ($_GET['uploaded'] === 'yes') {
+    echo '<script> alert("file uploaded"); </script>';
+  } elseif ($_GET['uploaded'] === 'no') {
+    echo '<script> alert("file already exists"); </script>';
+  } elseif ($_GET['uploaded'] === 'size') {
+    echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+  }
 }
 
-if (!empty($_GET['created']) && $_GET['created'] === 'folder') {
-  echo '<script> alert("folder created"); </script>';
-} elseif (!empty($_GET['created']) && $_GET['created'] === 'file') {
-  echo '<script> alert("file created"); </script>';
-} elseif (!empty($_GET['created']) && $_GET['created'] === 'size') {
-  echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+if (!empty($_GET['created'])) {
+  if ($_GET['created'] === 'folder') {
+    echo '<script> alert("folder created"); </script>';
+  } elseif ($_GET['created'] === 'file') {
+    echo '<script> alert("file created"); </script>';
+  } elseif ($_GET['created'] === 'size') {
+    echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+  }
 }
 
-if (!empty($_GET['updated'])) echo '<script> alert("file updated"); </script>';
+if (!empty($_GET['updated'])) {
+  if ($_GET['updated'] === 'yes') {
+    echo '<script> alert("file updated"); </script>';
+  } elseif ($_GET['updated'] === 'no') {
+    echo '<script> alert("file' . $_GET['file'] . 'does not exist"); </script>';
+  } elseif ($_GET['updated'] === 'size') {
+    echo '<script> alert("you have reach the max capacity of your cloud"); </script>';
+  }
+}
 
 if (!empty($_GET['displayed'])) echo '<script> alert("file cannot be displayed"); </script>';
 

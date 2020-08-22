@@ -10,6 +10,7 @@ class File extends Database
       $file = $file_link = filter_var($_POST['file_name'], FILTER_SANITIZE_STRING);
       $path = filter_var($_POST['path'] . DIRECTORY_SEPARATOR, FILTER_SANITIZE_STRING);
       $file_name = filter_var(pathinfo($file, PATHINFO_FILENAME), FILTER_SANITIZE_STRING);
+      $home_size = directorySize(HOME);
 
       if (strpos($file, '.') === false) {
         if ($home_size < 100) {
@@ -69,20 +70,36 @@ class File extends Database
 
       // for AJAX
       // print_r($_POST);
-      // echo "file $element_image uploaded";
     }
   }
 
   public function update_file()
   {
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update'])) {
+      $file = $file_link = filter_var($_POST['path'], FILTER_SANITIZE_STRING);
+      $file_name = filter_var(pathinfo($file, PATHINFO_FILENAME), FILTER_SANITIZE_STRING);
       $user_id = filter_var((new User())->user_id($_SESSION['user']), FILTER_SANITIZE_STRING);
       $path = filter_var($_POST['path'], FILTER_SANITIZE_STRING);
       $content = filter_var($_POST['file_content'], FILTER_SANITIZE_STRING);
 
-      file_put_contents($path, $content);
+      // check if file exists in database
+      $stmt = $this->run_query('SELECT * FROM files WHERE file_name = :file_name', ['file_name' => $file_name]);
+      $get_file = $stmt->fetch();
 
-      header('Location:../templates/home.php?updated=yes');
+      if ($get_file !== false) {
+        if (HOME_SIZE < 100 || filesize($file) < 100) {
+          file_put_contents($path, $content);
+
+          $get_file_id = $get_file['file_id'];
+          $this->run_query('UPDATE files SET file_content = 0, file_date = NOW() WHERE file_id = :get_file_id', ['get_file_id' => $get_file_id]);
+
+          header('Location:../templates/home.php?updated=yes');
+        } else {
+          header('Location:../templates/home.php?uploaded=size');
+        }
+      } else {
+        header('Location:../templates/home.php?updated=no');
+      }
     }
   }
 
@@ -116,22 +133,26 @@ class File extends Database
         </form>
         <?php
       } elseif ($file_type[0] === 'image') {
-        echo '
-        <img src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" style="max-width: 100%; height: auto; padding: 1rem 0">
-        <a href="home/' . basename($file) . '" download>
+        ?>
+        <img src="<?php echo base_url() . DIRECTORY_SEPARATOR . basename($file); ?>" style="max-width: 100%; height: auto; padding: 1rem 0">
+        <a href="home/<?php echo basename($file); ?>" download>
         <button type="button">download</button>
         </a>
-        ';
+        <?php
       } elseif ($file_type[0] === 'audio') {
-        echo '
+        ?>
         <audio controls autoplay="1" loop="true" style="width: 100%; padding: 1rem 0">
-        <source src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '">
+        <source src="<?php echo base_url() . DIRECTORY_SEPARATOR . basename($file); ?>">
         </audio>
-        ';
+        <?php
       } elseif ($file_type[1] === 'pdf') {
-        echo '<iframe src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>';
+        ?>
+        <iframe src="<?php echo base_url() . DIRECTORY_SEPARATOR . basename($file); ?>" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>
+        <?php
       } elseif ($file_type[0] === 'video') {
-        echo '<iframe src="' . base_url() . DIRECTORY_SEPARATOR . basename($file) . '" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>';
+        ?>
+        <iframe src="<?php echo base_url() . DIRECTORY_SEPARATOR . basename($file); ?>" frameborder="1" style="width: 100%; height: 500px; padding: 1rem 0"></iframe>
+        <?php
       }
     } else {
       header("Location:../templates/home.php?displayed=no");
